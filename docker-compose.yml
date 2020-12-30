@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+  backend:
+    # restart: always
+    container_name: backend
+    build:
+      context: ./Backend/
+      dockerfile: Dockerfile
+    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+  frontend:
+    # restart: always
+    container_name: frontend
+    build:
+      context: ./client/
+      dockerfile: Dockerfile
+    command : npm start
+    ports:
+      - "3000:3000"
+    stdin_open: true
+    depends_on:
+      - backend
